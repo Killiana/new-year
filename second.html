@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    
+    <title>Document</title>
+    <style>
+      li{
+        text-transform: capitalize;
+      }
+      .wrapper {
+        max-width: 650px;
+        display: block;
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+        margin-top: 25px;
+        line-height: 1.5;
+        border: 1px solid black;
+        border-radius: 15px;
+      }
+      .search-control {
+        display: block;
+        width: 100%;
+      }
+      .search-button {
+        display: inline-block;
+      }
+      .icon{
+        font-size: 40px;
+      }
+      .temp{
+        font-size: 40px;
+      }
+      .cels{
+        font-size: 14px;
+        text-decoration: none;
+    
+      }
+      
+      .fahr{
+        font-size: 14px;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <a href="#">Lisbon</a>
+      <a href="#">Paris</a>
+      <a href="#">Sydney</a>
+      <a href="#">San Francisco</a>
+      
+      <form class="dis-form">
+      <div class="row">
+        <div class="col-8">
+        <input
+          type="search"
+          placeholder="Type a city"
+          autofocus="on"
+          id="search-form"
+          class="search-control"
+        />
+        </div>
+        <div class="col-2">
+        <input type="submit" value="Search" class="search-button" />
+        >
+        </div>
+      </form>
+      <div class="col-2">
+      <button id="current-button">Current</button>
+      </div>
+      </div>
+      <h1>Lisbon</h1>
+      <ul>
+        <li class="current-day">Thursday 11:13</li>
+        <li id="description">Clear</li>
+      </ul>
+      <div class="row">
+        <div class="col-6">
+          <span class="icon"> 🌞 </span> <span class="temp" id="temperature">  28 </span> <span class="units"> <a href="#" class="cels" id="cels"> Cº</a> | <a href="#" class="fahr" id="fahr">Fº</a></span>  
+
+        </div>
+        <div class="col-6">
+          <ul>
+            <li>Humidity: <span id="humidity">38</span> %</li>
+            <li>Wind: <span id="wind">5</span> km/h</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <script>
+      
+
+function displayCity(response){
+  document.querySelector("h1").innerHTML = response.data.name;
+  document.querySelector("#temperature").innerHTML = Math.round(response.data.main.temp);
+  document.querySelector("#humidity").innerHTML = response.data.main.humidity;
+  document.querySelector("#wind").innerHTML = Math.round(response.data.wind.speed);
+  document.querySelector("#description").innerHTML = response.data.weather[0].description;
+}
+
+  function showCity(city){
+    let apiKey = `5d480a9ea4973e7dfcb6ca4444c1582f`;
+    let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+    axios.get(apiUrl).then(displayCity);
+  }
+
+function findCity(event){
+  event.preventDefault();
+  let input = document.querySelector("#search-form");
+let city = document.querySelector("h1").innerHTML = input.value;
+showCity(city);
+}
+
+function displayPose(response){
+  let lat = response.coords.latitude;
+  let lon = response.coords.longitude;
+  let apiKey = `5d480a9ea4973e7dfcb6ca4444c1582f`;
+  let apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+  axios.get(apiUrl).then(displayCity);
+}
+
+function getCurrentPose(event){
+  event.preventDefault();
+  navigator.geolocation.getCurrentPosition(displayPose);
+}
+
+function getFahr(event){
+  event.preventDefault();
+let temperatureEl = document.querySelector("#temperature");
+
+ let temperature = temperatureEl.innerHTML;
+ temperature = Number(temperature);
+  temperatureEl.innerHTML = Math.round(temperature * 9/5) + 32;
+}
+
+function getCels(event){ 
+  event.preventDefault();
+  let temperatureEl = document.querySelector("#temperature");
+  let temperature = temperatureEl.innerHTML;
+  temperatureEl.innerHTML = Math.round((temperature - 32) * 5/9);
+ 
+}
+  
+  let fahrLink = document.querySelector("#fahr");
+  fahrLink.addEventListener("click", getFahr); 
+  let celsLink = document.querySelector("#cels");
+  celsLink.addEventListener("click", getCels);
+
+
+
+
+let zeCity = document.querySelector(".dis-form");
+      zeCity.addEventListener("submit", findCity);
+let currentButton = document.querySelector("#current-button");
+currentButton.addEventListener("click", getCurrentPose);
+ 
+ let now = new Date();
+      let displayDate = document.querySelector(".current-day");
+      let hours = now.getHours();
+      if (hours < 0){
+        hours = `0${hours}`;
+      }
+      let minutes = now.getMinutes();
+      if (minutes < 10){
+        minutes = `0${minutes}`;
+      }
+
+      let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      let day = days[now.getDay()];
+      
+      displayDate.innerHTML = `${day} ${hours}:${minutes}`;
+
+
+showCity("New York");
+
+    </script>
+  </body>
+</html>
